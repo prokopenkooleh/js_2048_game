@@ -76,6 +76,8 @@ class Game {
     if (moved) {
       this.addRandomTile();
       this.checkGameOver();
+
+      return true;
     }
   }
 
@@ -117,21 +119,30 @@ class Game {
     if (moved) {
       this.addRandomTile();
       this.checkGameOver();
+
+      return true;
     }
   }
 
   moveUp() {
     this.currentState = this.transpose(this.currentState);
-    this.moveLeft();
+
+    const moved = this.moveLeft();
+
     this.currentState = this.transpose(this.currentState);
+
+    return moved;
   }
 
   moveDown() {
     this.currentState = this.transpose(this.currentState);
-    this.moveRight();
-    this.currentState = this.transpose(this.currentState);
-  }
 
+    const moved = this.moveRight();
+
+    this.currentState = this.transpose(this.currentState);
+
+    return moved;
+  }
   /**
    * @returns {number}
    */
@@ -168,6 +179,7 @@ class Game {
   restart() {
     this.currentState = structuredClone(this.initialState);
     this.score = 0;
+    this.gameStatus = 'playing';
 
     this.addRandomTile();
     this.addRandomTile();
@@ -215,7 +227,7 @@ class Game {
       }
     }
 
-    for (let row = 0; row < this.currentState.length; row++) {
+    for (let row = 0; row < this.currentState.length - 1; row++) {
       for (let col = 0; col < this.currentState[row].length - 1; col++) {
         if (this.currentState[row][col] === this.currentState[row][col + 1]) {
           return false;

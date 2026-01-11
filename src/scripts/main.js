@@ -13,12 +13,13 @@ const winMessage = document.querySelector('.message-win');
 startButton.addEventListener('click', () => {
   if (game.getStatus() === 'playing') {
     game.restart();
+
+    loseMessage.classList.add('hidden');
   } else {
     game.start();
 
     startButton.textContent = 'Restart';
     startButton.classList.replace('start', 'restart');
-
     startMessage.classList.add('hidden');
   }
 
@@ -37,19 +38,15 @@ function updateGameField() {
 
       cell.textContent = value === 0 ? '' : value;
 
+      cell.className = 'field-cell';
+
       if (value !== 0) {
         cell.classList.add(`field-cell--${value}`);
-      } else {
-        cell.className = 'field-cell';
       }
     }
   }
 
   gameScore.textContent = game.getScore();
-
-  if (game.getStatus() === 'lose') {
-    loseMessage.classList.remove('hidden');
-  }
 
   if (game.getStatus() === 'win') {
     winMessage.classList.remove('hidden');
@@ -61,20 +58,28 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
+  let moved = false;
+
   switch (e.key) {
     case 'ArrowLeft':
-      game.moveLeft();
+      moved = game.moveLeft();
       break;
     case 'ArrowRight':
-      game.moveRight();
+      moved = game.moveRight();
       break;
     case 'ArrowUp':
-      game.moveUp();
+      moved = game.moveUp();
       break;
     case 'ArrowDown':
-      game.moveDown();
+      moved = game.moveDown();
       break;
   }
 
-  updateGameField();
+  if (moved) {
+    updateGameField();
+
+    if (game.checkGameOver()) {
+      loseMessage.classList.remove('hidden');
+    }
+  }
 });
