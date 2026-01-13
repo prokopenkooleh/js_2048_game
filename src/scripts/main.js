@@ -9,12 +9,15 @@ const gameScore = document.querySelector('.game-score');
 const startMessage = document.querySelector('.message-start');
 const loseMessage = document.querySelector('.message-lose');
 const winMessage = document.querySelector('.message-win');
+let startX = 0;
+let startY = 0;
 
 startButton.addEventListener('click', () => {
   if (game.getStatus() === 'playing') {
     game.restart();
 
     loseMessage.classList.add('hidden');
+    winMessage.classList.add('hidden');
   } else {
     game.start();
 
@@ -51,6 +54,10 @@ function updateGameField() {
   if (game.getStatus() === 'win') {
     winMessage.classList.remove('hidden');
   }
+
+  if (game.getStatus() === 'lose') {
+    loseMessage.classList.remove('hidden');
+  }
 }
 
 document.addEventListener('keydown', (e) => {
@@ -77,9 +84,47 @@ document.addEventListener('keydown', (e) => {
 
   if (moved) {
     updateGameField();
+  }
+});
 
-    if (game.checkGameOver()) {
-      loseMessage.classList.remove('hidden');
-    }
+document.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+
+  startX = touch.clientX;
+  startY = touch.clientY;
+});
+
+document.addEventListener('touchend', (e) => {
+  if (game.getStatus() !== 'playing') {
+    return;
+  }
+
+  const touch = e.changedTouches[0];
+  const endX = touch.clientX;
+  const endY = touch.clientY;
+
+  const diffX = endX - startX;
+  const diffY = endY - startY;
+
+  const absX = Math.abs(diffX);
+  const absY = Math.abs(diffY);
+
+  // мінімальна довжина свайпу
+  if (Math.max(absX, absY) < 30) {
+    return;
+  }
+
+  let moved = false;
+
+  if (absX > absY) {
+    // горизонтальний свайп
+    moved = diffX > 0 ? game.moveRight() : game.moveLeft();
+  } else {
+    // вертикальний свайп
+    moved = diffY > 0 ? game.moveDown() : game.moveUp();
+  }
+
+  if (moved) {
+    updateGameField();
   }
 });
